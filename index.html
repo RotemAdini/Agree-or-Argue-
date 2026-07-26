@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#7c3aed" />
+  <title>מסכימים או מסתבכים? — משחק זוגי</title>
+  <style>
+    :root {
+      --bg-1: #160b2d;
+      --bg-2: #2d145f;
+      --card: rgba(255, 255, 255, 0.12);
+      --card-strong: rgba(255, 255, 255, 0.18);
+      --border: rgba(255, 255, 255, 0.18);
+      --text: #fffafc;
+      --muted: #d9d1e7;
+      --purple: #9d63ff;
+      --pink: #ff5fa2;
+      --green: #47d7ac;
+      --red: #ff758f;
+      --yellow: #ffd166;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Arial, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 95, 162, 0.25), transparent 30%),
+        radial-gradient(circle at 88% 24%, rgba(157, 99, 255, 0.34), transparent 34%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2));
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(10px);
+      opacity: 0.22;
+      pointer-events: none;
+    }
+
+    body::before {
+      width: 230px;
+      height: 230px;
+      background: var(--pink);
+      top: -90px;
+      right: -70px;
+    }
+
+    body::after {
+      width: 260px;
+      height: 260px;
+      background: var(--purple);
+      bottom: -120px;
+      left: -80px;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(920px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      animation: fadeIn 0.45s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: linear-gradient(150deg, rgba(255,255,255,0.14), rgba(255,255,255,0.07));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: clamp(24px, 5vw, 48px);
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -60% auto;
+      width: 330px;
+      height: 330px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 95, 162, 0.25), transparent 65%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(255,255,255,0.11);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin: 22px 0 12px;
+      font-size: clamp(2.25rem, 8vw, 5.3rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    h1 span {
+      display: block;
+      color: #ffd8e8;
+      text-shadow: 0 0 28px rgba(255, 95, 162, 0.28);
+    }
+
+    .lead {
+      max-width: 680px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.6vw, 1.25rem);
+      line-height: 1.7;
+    }
+
+    .language-note {
+      max-width: 680px;
+      margin: -2px 0 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 28px 0;
+    }
+
+    .rule {
+      min-height: 128px;
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .rule strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.02rem;
+    }
+
+    .rule span {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.94rem;
+    }
+
+    .rule-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.1);
+      font-size: 1.3rem;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .answer-btn,
+    .next-btn {
+      border: 0;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .primary-btn,
+    .next-btn {
+      width: 100%;
+      padding: 17px 22px;
+      border-radius: 17px;
+      color: #251040;
+      background: linear-gradient(135deg, #ffe0eb, #ffffff);
+      font-weight: 900;
+      font-size: 1.08rem;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.2);
+    }
+
+    .primary-btn:hover,
+    .next-btn:hover,
+    .secondary-btn:hover,
+    .answer-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+
+    .primary-btn:active,
+    .next-btn:active,
+    .secondary-btn:active,
+    .answer-btn:active {
+      transform: translateY(0) scale(0.985);
+    }
+
+    .secondary-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 15px 20px;
+      border-radius: 17px;
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      font-weight: 800;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .round-number,
+    .category-chip {
+      white-space: nowrap;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #efe9f9;
+    }
+
+    .category-chip {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .progress-shell {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      transition: width 0.45s ease;
+      box-shadow: 0 0 20px rgba(255,95,162,0.35);
+    }
+
+    .question-wrap {
+      min-height: 490px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .question-kicker {
+      color: #ffd8e8;
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .question {
+      max-width: 720px;
+      margin: 14px auto 18px;
+      font-size: clamp(1.85rem, 5.2vw, 3.45rem);
+      line-height: 1.22;
+      letter-spacing: -0.035em;
+    }
+
+    .countdown-note {
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+
+    .countdown-note strong {
+      color: var(--yellow);
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      max-width: 670px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .answer-btn {
+      min-height: 84px;
+      padding: 17px;
+      border-radius: 22px;
+      color: #fff;
+      font-weight: 900;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+    }
+
+    .answer-btn.agree {
+      background: linear-gradient(140deg, #2ea887, #49d9ad);
+    }
+
+    .answer-btn.disagree {
+      background: linear-gradient(140deg, #e44d71, #ff7890);
+    }
+
+    .answer-btn small {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.77rem;
+      font-weight: 700;
+      opacity: 0.84;
+    }
+
+    .feedback {
+      display: none;
+      max-width: 670px;
+      width: 100%;
+      margin: 26px auto 0;
+      padding: 22px;
+      border-radius: 22px;
+      text-align: right;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.12);
+      animation: popIn 0.32s ease;
+    }
+
+    .feedback.visible {
+      display: block;
+    }
+
+    .feedback-title {
+      margin-bottom: 7px;
+      font-size: 1.28rem;
+      font-weight: 900;
+    }
+
+    .feedback-text {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .challenge-box {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      color: #3a2149;
+      background: linear-gradient(135deg, #ffe7b1, #fff5d9);
+      text-align: right;
+    }
+
+    .challenge-box.visible {
+      display: block;
+    }
+
+    .challenge-box strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .next-btn {
+      display: none;
+      max-width: 670px;
+      margin: 16px auto 0;
+    }
+
+    .next-btn.visible {
+      display: block;
+    }
+
+    .result-panel {
+      text-align: center;
+    }
+
+    .score-ring {
+      width: min(260px, 68vw);
+      aspect-ratio: 1;
+      margin: 22px auto 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      position: relative;
+      background: conic-gradient(var(--pink) 0deg, var(--purple) 0deg, rgba(255,255,255,0.08) 0deg);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      transition: background 1s ease;
+    }
+
+    .score-ring::before {
+      content: "";
+      position: absolute;
+      inset: 17px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #241044, #32155e);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .score-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .score-number {
+      display: block;
+      font-size: clamp(3.1rem, 10vw, 5.7rem);
+      line-height: 0.95;
+      font-weight: 1000;
+      letter-spacing: -0.06em;
+    }
+
+    .score-label {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .result-title {
+      margin: 18px 0 8px;
+      font-size: clamp(1.7rem, 5vw, 2.7rem);
+    }
+
+    .result-copy {
+      max-width: 620px;
+      margin: 0 auto 22px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .stat {
+      padding: 18px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 1.55rem;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .final-task {
+      margin: 22px 0;
+      padding: 20px;
+      border-radius: 20px;
+      color: #352043;
+      background: linear-gradient(135deg, #ffe3ee, #fff8fb);
+      text-align: right;
+    }
+
+    .final-task strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .result-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 20;
+      right: 50%;
+      bottom: 24px;
+      transform: translateX(50%) translateY(20px);
+      padding: 12px 18px;
+      border-radius: 999px;
+      color: #27143d;
+      background: #fff;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s ease;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(50%) translateY(0);
+    }
+
+    .burst {
+      position: fixed;
+      z-index: 30;
+      pointer-events: none;
+      font-size: 24px;
+      animation: burst 1.2s ease-out forwards;
+    }
+
+
+    .topic-intro-panel {
+      min-height: min(680px, calc(100vh - 44px));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .topic-orbit {
+      width: 150px;
+      height: 150px;
+      margin: 10px auto 24px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2), rgba(255,255,255,0.05) 58%, transparent 60%);
+      animation: topicPulse 2.2s ease-in-out infinite;
+    }
+
+    .topic-orbit::before,
+    .topic-orbit::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      animation: topicRing 2.2s ease-out infinite;
+    }
+
+    .topic-orbit::after {
+      animation-delay: 1.1s;
+    }
+
+    .topic-icon {
+      position: relative;
+      z-index: 2;
+      font-size: 4.4rem;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+      animation: topicFloat 2s ease-in-out infinite;
+    }
+
+    .topic-count {
+      color: #ffd8e8;
+      font-weight: 900;
+      font-size: 0.95rem;
+    }
+
+    .topic-title {
+      margin: 12px 0 10px;
+      font-size: clamp(2.2rem, 7vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+
+    .topic-copy {
+      max-width: 590px;
+      margin: 0 auto 26px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.65;
+    }
+
+    .topic-auto-note {
+      margin: 0;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .five-rounds {
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      margin-bottom: 28px;
+    }
+
+    .five-rounds span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.04);
+      animation: dotWave 1.4s ease-in-out infinite;
+    }
+
+    .five-rounds span:nth-child(2) { animation-delay: 0.12s; }
+    .five-rounds span:nth-child(3) { animation-delay: 0.24s; }
+    .five-rounds span:nth-child(4) { animation-delay: 0.36s; }
+    .five-rounds span:nth-child(5) { animation-delay: 0.48s; }
+
+    .topic-results {
+      margin: 24px 0;
+      text-align: right;
+    }
+
+    .topic-results h3 {
+      margin: 0 0 12px;
+      font-size: 1.25rem;
+    }
+
+    .best-topic {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding: 18px;
+      border-radius: 20px;
+      color: #352043;
+      background: linear-gradient(135deg, #ffe3ee, #fff8fb);
+    }
+
+    .best-topic-icon {
+      flex: 0 0 auto;
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 17px;
+      background: rgba(124,58,237,0.1);
+      font-size: 1.8rem;
+    }
+
+    .best-topic strong,
+    .best-topic span {
+      display: block;
+    }
+
+    .best-topic strong {
+      margin-bottom: 3px;
+      font-size: 1.08rem;
+    }
+
+    .best-topic span {
+      color: #624e70;
+      line-height: 1.45;
+    }
+
+    .category-results {
+      display: grid;
+      gap: 10px;
+    }
+
+    .category-result {
+      padding: 14px 15px;
+      border-radius: 17px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .category-result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 9px;
+      font-weight: 800;
+    }
+
+    .category-result-head span:last-child {
+      color: #ffd8e8;
+    }
+
+    .category-result-bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .category-result-bar span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+    }
+
+    @keyframes topicPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes topicRing {
+      0% { opacity: 0.65; transform: scale(0.72); }
+      100% { opacity: 0; transform: scale(1.45); }
+    }
+
+    @keyframes topicFloat {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    @keyframes dotWave {
+      0%, 100% { transform: translateY(0); opacity: 0.35; }
+      50% { transform: translateY(-7px); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes burst {
+      0% { opacity: 0; transform: translate(0, 0) scale(0.6) rotate(0deg); }
+      15% { opacity: 1; }
+      100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.3) rotate(var(--r)); }
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        padding: 12px;
+        align-items: stretch;
+      }
+
+      .panel {
+        min-height: calc(100vh - 24px);
+        border-radius: 24px;
+        padding: 24px 17px;
+      }
+
+      .rule-grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .rule {
+        min-height: auto;
+      }
+
+      .question-wrap {
+        min-height: calc(100vh - 125px);
+      }
+
+      .answers,
+      .result-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .answer-btn {
+        min-height: 72px;
+      }
+
+      .topbar {
+        grid-template-columns: auto 1fr;
+      }
+
+      .category-chip {
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="startScreen" class="screen active">
+      <div class="panel">
+        <span class="eyebrow">⚡ 25 סיטואציות זוגיות</span>
+        <h1>מסכימים<br><span>או מסתבכים?</span></h1>
+        <p class="lead">
+          בכל סיבוב תופיע סיטואציה. ספרו עד שלוש, הצביעו יחד על מי שמתאים יותר,
+          ואז סמנו אם הסכמתם. בסוף תגלו את אחוז ההסכמה הזוגי שלכם.
+        </p>
+        <p class="language-note">* מטעמי נוחות, השאלות וההוראות נכתבו בלשון זכר אך פונות לכל המינים.</p>
+
+        <div class="rule-grid">
+          <div class="rule">
+            <div class="rule-icon">👀</div>
+            <strong>קוראים וחושבים</strong>
+            <span>אל תגלו את התשובה לפני ההצבעה.</span>
+          </div>
+          <div class="rule">
+            <div class="rule-icon">👉</div>
+            <strong>מצביעים יחד</strong>
+            <span>ב־3, 2, 1 מצביעים על עצמכם או זה על זה.</span>
+          </div>
+          <div class="rule">
+            <div class="rule-icon">📊</div>
+            <strong>מגלים את התוצאה</strong>
+            <span>מסמנים הסכמנו או לא הסכמנו ומקבלים אחוז בסיום.</span>
+          </div>
+        </div>
+
+        <button id="startBtn" class="primary-btn">מתחילים את הדו־קרב</button>
+      </div>
+    </section>
+
+
+    <section id="categoryScreen" class="screen">
+      <div class="panel topic-intro-panel">
+        <span id="topicCount" class="topic-count">מתחילים נושא חדש</span>
+        <div class="topic-orbit">
+          <span id="topicIcon" class="topic-icon">😂</span>
+        </div>
+        <h2 id="topicTitle" class="topic-title">חלק 1: צחוקים ופדיחות</h2>
+        <p id="topicCopy" class="topic-copy"></p>
+        <div class="five-rounds" aria-label="חמש שאלות בנושא">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen">
+      <div class="panel">
+        <div class="topbar">
+          <span id="roundNumber" class="round-number">1 מתוך 25</span>
+          <div class="progress-shell" aria-label="התקדמות במשחק">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <span id="categoryChip" class="category-chip">מצחיק</span>
+        </div>
+
+        <div class="question-wrap">
+          <div id="questionKicker" class="question-kicker">צחוקים ופדיחות</div>
+          <h2 id="questionText" class="question"></h2>
+          <p class="countdown-note">אל תגלו עדיין — <strong>3, 2, 1... מצביעים!</strong></p>
+
+          <div id="answers" class="answers">
+            <button class="answer-btn agree" data-answer="agree">
+              הסכמנו
+              <small>שנינו הצבענו על אותו אדם</small>
+            </button>
+            <button class="answer-btn disagree" data-answer="disagree">
+              לא הסכמנו
+              <small>כל אחד הצביע אחרת</small>
+            </button>
+          </div>
+
+          <div id="feedback" class="feedback" aria-live="polite">
+            <div id="feedbackTitle" class="feedback-title"></div>
+            <p id="feedbackText" class="feedback-text"></p>
+            <div id="challengeBox" class="challenge-box">
+              <strong id="challengeTitle"></strong>
+              <span id="challengeText"></span>
+            </div>
+          </div>
+
+          <button id="nextBtn" class="next-btn">לסיטואציה הבאה</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen">
+      <div class="panel result-panel">
+        <span class="eyebrow">💘 מדד התיאום הזוגי</span>
+
+        <div id="scoreRing" class="score-ring">
+          <div class="score-content">
+            <span id="scoreNumber" class="score-number">0%</span>
+            <span class="score-label">אחוז הסכמה</span>
+          </div>
+        </div>
+
+        <h2 id="resultTitle" class="result-title"></h2>
+        <p id="resultCopy" class="result-copy"></p>
+
+        <div class="stats">
+          <div class="stat">
+            <strong id="agreeStat">0</strong>
+            <span>פעמים שהסכמתם</span>
+          </div>
+          <div class="stat">
+            <strong id="disagreeStat">0</strong>
+            <span>פעמים שהסתבכתם</span>
+          </div>
+          <div class="stat">
+            <strong id="streakStat">0</strong>
+            <span>רצף ההסכמות הארוך</span>
+          </div>
+        </div>
+
+
+        <div class="topic-results">
+          <h3>איפה אתם הכי מסכימים?</h3>
+          <div id="bestTopic" class="best-topic">
+            <div id="bestTopicIcon" class="best-topic-icon">💘</div>
+            <div>
+              <strong id="bestTopicTitle"></strong>
+              <span id="bestTopicCopy"></span>
+            </div>
+          </div>
+          <div id="categoryResults" class="category-results"></div>
+        </div>
+
+        <div class="final-task">
+          <strong>משימת הסיום שלכם</strong>
+          כל אחד אומר דבר אחד שהוא גילה הערב על הדרך שבה השני רואה אותו.
+        </div>
+
+        <div class="result-actions">
+          <button id="shareBtn" class="primary-btn">שתפו את התוצאה</button>
+          <button id="restartBtn" class="secondary-btn">שחקו שוב</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">התוצאה הועתקה</div>
+
+  <script>
+    const categories = [
+      {
+        id: "funny",
+        name: "צחוקים ופדיחות",
+        chip: "מצחיק",
+        icon: "😂",
+        copy: "פותחים בחמש סיטואציות קלילות שיחשפו מי מכם מספק יותר חומר לבדיחות.",
+        questions: [
+          "מי מכם יותר סביר שיגיד ‘אני לא רעב’ ואז יאכל חצי מהצלחת של השני?",
+          "מי מכם יותר סביר שיחפש את הטלפון בזמן שהוא כבר ביד שלו?",
+          "מי מכם יותר סביר שיירדם באמצע הסרט שהוא בעצמו בחר?",
+          "מי מכם יותר סביר שיצחק דווקא ברגע שבו ממש אסור לצחוק?",
+          "מי מכם יותר סביר שיתחיל לספר סיפור ואז ישכח למה התחיל?"
+        ]
+      },
+      {
+        id: "habits",
+        name: "הרגלים בבית",
+        chip: "הרגלים",
+        icon: "🏠",
+        copy: "עכשיו בודקים את הדברים הקטנים שחוזרים בכל יום — ושכל אחד מכם כנראה זוכר אחרת.",
+        questions: [
+          "מי מכם יותר סביר שידחה את השעון המעורר שוב ושוב עד שכבר מאוחר מדי?",
+          "מי מכם יותר סביר שישאיר כוס במקום אקראי בבית ויחפש אותה אחר כך?",
+          "מי מכם יותר סביר שיגיד ‘נסדר מחר’ וימשיך לדחות גם מחר?",
+          "מי מכם יותר סביר שיגיד ‘אני מוכן’ כשבפועל נשארו לו עוד עשרים דקות?",
+          "מי מכם יותר סביר שיארוז חצי בית לחופשה של לילה אחד?"
+        ]
+      },
+      {
+        id: "money",
+        name: "בילויים וכסף",
+        chip: "בילויים וכסף",
+        icon: "💸",
+        copy: "חמש שאלות על החלטות, יציאות וקניות. כאן בדרך כלל מתחילים הוויכוחים הטובים באמת.",
+        questions: [
+          "מי מכם יותר סביר שיבדוק את התפריט עוד לפני שהגעתם למסעדה?",
+          "מי מכם יותר סביר שיבחר מה להזמין ואז יתחרט כשהאוכל מגיע?",
+          "מי מכם יותר סביר שיזמין חופשה לפני שבדק מה המחיר הסופי?",
+          "מי מכם יותר סביר שיקנה משהו רק כי היה כתוב עליו ‘מבצע’?",
+          "מי מכם יותר סביר שיציע לצאת מהבית בלי שום תוכנית לאן הולכים?"
+        ]
+      },
+      {
+        id: "relationship",
+        name: "זוגיות ורגש",
+        chip: "זוגיות ורגש",
+        icon: "💞",
+        copy: "עוברים למה שבאמת קורה ביניכם: פיוסים, תשומת לב וכל הדברים הקטנים שמרגישים גדולים.",
+        questions: [
+          "מי מכם יותר סביר שייזום פיוס ראשון אחרי ויכוח?",
+          "מי מכם יותר סביר שיזכור פרט קטן שהשני סיפר לפני חודשים?",
+          "מי מכם יותר סביר שיתכנן הפתעה זוגית בלי סיבה מיוחדת?",
+          "מי מכם יותר סביר שישים לב שמשהו מפריע לשני עוד לפני שנאמרה מילה?",
+          "מי מכם יותר סביר שייזום שיחה רצינית כשיש משהו שצריך לפתור?"
+        ]
+      },
+      {
+        id: "romance",
+        name: "רומנטיקה ופלרטוט",
+        chip: "רומנטיקה",
+        icon: "🔥",
+        copy: "מסיימים בחמש סיטואציות קצת יותר רומנטיות. נראה אם גם כאן אתם קוראים זה את זה נכון.",
+        questions: [
+          "מי מכם יותר סביר שייזום נשיקה ברגע הכי לא צפוי?",
+          "מי מכם יותר סביר שישלח הודעה פלרטטנית באמצע יום עבודה רגיל?",
+          "מי מכם יותר סביר שיהפוך ערב רגיל בבית לערב הרבה יותר רומנטי?",
+          "מי מכם יותר סביר שיתבייש כשהשני מחמיא לו מול אנשים?",
+          "מי מכם יותר סביר שיתחיל חיבוק ולא ירצה לשחרר?"
+        ]
+      }
+    ];
+
+    const agreeResponses = [
+      ["התאמה!", "שניכם יודעים בדיוק במי מדובר."],
+      ["מסכימים בלי היסוס", "מישהו כאן צפוי מאוד — ושניכם יודעים מי."],
+      ["אותה גרסה לאירועים", "יפה. לפחות על זה אין ויכוח בבית."],
+      ["נקודה לתיאום", "הסכמתם מהר מדי. קצת חשוד, אבל מרשים."],
+      ["יש ביניכם קליטה", "עוד תשובה שבה אתם קוראים זה את זה בלי מילים."]
+    ];
+
+    const disagreeResponses = [
+      ["הסתבכתם!", "שתי תשובות, זוגיות אחת. עכשיו מתחיל הוויכוח האמיתי."],
+      ["רגע, מה?", "כנראה שכל אחד מכם חי בגרסה אחרת של אותה זוגיות."],
+      ["אין הסכמה", "כל אחד בטוח שהשני הוא הבעיה. קלאסי."],
+      ["מחלוקת רשמית", "הגיע הזמן לפתוח את תיק הראיות."],
+      ["לא אותו סיפור", "מעניין מי מכם יצליח לשכנע את השני."]
+    ];
+
+    const challenges = [
+      ["תביאו הוכחה", "לכל אחד יש 15 שניות לספר על מקרה שמוכיח שהתשובה שלו נכונה."],
+      ["נאום ההגנה", "כל אחד מקבל 10 שניות להסביר למה הסיטואציה הזאת ממש לא מתארת אותו."],
+      ["הפעם האחרונה", "נסו להיזכר יחד בפעם האחרונה שזה באמת קרה."],
+      ["בלי להתחמק", "כל אחד אומר במשפט אחד למה הוא הצביע דווקא כך."],
+      ["פשרה זוגית", "החליטו יחד מי באמת מתאים יותר — או קבלו שלעולם לא תסכימו."],
+      ["מחיר ההסתבכות", "לפני שממשיכים, כל אחד נותן לשני מחמאה אחת שלא אמר בזמן האחרון."]
+    ];
+
+    const resultBands = [
+      { min: 80, title: "אותו ראש, שני אנשים", copy: "אתם יודעים בדיוק מי עושה מה, מי אשם ובמי אסור לתת אמון עם כרטיס האשראי. רמת תיאום מרשימה מאוד." },
+      { min: 60, title: "מכירים מצוין, מתווכחים על הפרטים", copy: "אתם רואים את הזוגיות די דומה — אבל תמיד מצליחים למצוא פרט קטן ששווה להתווכח עליו." },
+      { min: 40, title: "חצי הסכמה, חצי הסתבכות", copy: "לפעמים אתם קוראים זה את זה בלי מילים, ולפעמים לא ברור אם הייתם בכלל באותו אירוע." },
+      { min: 20, title: "שתי גרסאות לאותה זוגיות", copy: "אתם מכירים אחד את השני, אבל כל אחד מתעקש לספר את הסיפור בצורה אחרת לגמרי." },
+      { min: 0, title: "זוג אחד, שני יקומים", copy: "על דבר אחד בטוח הסכמתם: אף פעם לא משעמם אצלכם. עכשיו יש לכם הרבה על מה לדבר." }
+    ];
+
+    const startScreen = document.getElementById("startScreen");
+    const categoryScreen = document.getElementById("categoryScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const questionText = document.getElementById("questionText");
+    const roundNumber = document.getElementById("roundNumber");
+    const categoryChip = document.getElementById("categoryChip");
+    const progressFill = document.getElementById("progressFill");
+    const answers = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const feedbackTitle = document.getElementById("feedbackTitle");
+    const feedbackText = document.getElementById("feedbackText");
+    const challengeBox = document.getElementById("challengeBox");
+    const challengeTitle = document.getElementById("challengeTitle");
+    const challengeText = document.getElementById("challengeText");
+    const nextBtn = document.getElementById("nextBtn");
+    const scoreRing = document.getElementById("scoreRing");
+    const toast = document.getElementById("toast");
+    const questionKicker = document.getElementById("questionKicker");
+
+    let categoryIntroTimer = null;
+
+    let gameQuestions = [];
+    let currentIndex = 0;
+    let agreeCount = 0;
+    let disagreeCount = 0;
+    let currentStreak = 0;
+    let bestStreak = 0;
+    let challengesShown = 0;
+    let answeredCurrent = false;
+    let categoryStats = {};
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildQuestions() {
+      return categories.flatMap(category =>
+        shuffle(category.questions).map(text => ({
+          text,
+          categoryId: category.id,
+          category: category.chip
+        }))
+      );
+    }
+
+    function showScreen(screen) {
+      [startScreen, categoryScreen, gameScreen, resultScreen].forEach(item => item.classList.remove("active"));
+      screen.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startGame() {
+      gameQuestions = buildQuestions();
+      currentIndex = 0;
+      agreeCount = 0;
+      disagreeCount = 0;
+      currentStreak = 0;
+      bestStreak = 0;
+      challengesShown = 0;
+      categoryStats = Object.fromEntries(categories.map(category => [category.id, { agree: 0, total: 0 }]));
+      showCategoryIntro(categories[0].id);
+    }
+
+    function showCategoryIntro(categoryId) {
+      const categoryIndex = categories.findIndex(category => category.id === categoryId);
+      const category = categories[categoryIndex];
+
+      if (categoryIntroTimer) {
+        clearTimeout(categoryIntroTimer);
+      }
+
+      document.getElementById("topicCount").textContent = categoryIndex === 0
+        ? "החלק הראשון מתחיל"
+        : "מחליפים נושא";
+      document.getElementById("topicIcon").textContent = category.icon;
+      document.getElementById("topicTitle").textContent = `חלק ${categoryIndex + 1}: ${category.name}`;
+      document.getElementById("topicCopy").textContent = category.copy;
+      showScreen(categoryScreen);
+
+      categoryIntroTimer = setTimeout(() => {
+        showScreen(gameScreen);
+        renderQuestion();
+      }, 1000);
+    }
+
+    function renderQuestion() {
+      answeredCurrent = false;
+      const item = gameQuestions[currentIndex];
+      questionText.textContent = item.text;
+      roundNumber.textContent = `${currentIndex + 1} מתוך ${gameQuestions.length}`;
+      const currentCategory = categories.find(category => category.id === item.categoryId);
+      questionKicker.textContent = currentCategory.name;
+      categoryChip.textContent = currentCategory.name;
+      progressFill.style.width = `${(currentIndex / gameQuestions.length) * 100}%`;
+
+      answers.style.display = "grid";
+      feedback.classList.remove("visible");
+      challengeBox.classList.remove("visible");
+      nextBtn.classList.remove("visible");
+      nextBtn.textContent = currentIndex === gameQuestions.length - 1 ? "לגלות את התוצאה" : "לסיטואציה הבאה";
+    }
+
+    function pickRandom(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function handleAnswer(type) {
+      if (answeredCurrent) return;
+      answeredCurrent = true;
+      answers.style.display = "none";
+
+      const item = gameQuestions[currentIndex];
+      categoryStats[item.categoryId].total++;
+
+      if (type === "agree") {
+        agreeCount++;
+        categoryStats[item.categoryId].agree++;
+        currentStreak++;
+        bestStreak = Math.max(bestStreak, currentStreak);
+        const response = pickRandom(agreeResponses);
+        feedbackTitle.textContent = response[0];
+        feedbackText.textContent = response[1];
+        createBurst();
+      } else {
+        disagreeCount++;
+        currentStreak = 0;
+        const response = pickRandom(disagreeResponses);
+        feedbackTitle.textContent = response[0];
+        feedbackText.textContent = response[1];
+
+        const shouldShowChallenge = disagreeCount % 2 === 1 && challengesShown < 5;
+        if (shouldShowChallenge) {
+          const challenge = challenges[challengesShown % challenges.length];
+          challengeTitle.textContent = challenge[0];
+          challengeText.textContent = challenge[1];
+          challengeBox.classList.add("visible");
+          challengesShown++;
+        }
+      }
+
+      feedback.classList.add("visible");
+      nextBtn.classList.add("visible");
+    }
+
+    function nextQuestion() {
+      if (!answeredCurrent) return;
+      if (currentIndex >= gameQuestions.length - 1) {
+        showResults();
+        return;
+      }
+
+      const currentCategoryId = gameQuestions[currentIndex].categoryId;
+      currentIndex++;
+      const nextCategoryId = gameQuestions[currentIndex].categoryId;
+
+      if (nextCategoryId !== currentCategoryId) {
+        showCategoryIntro(nextCategoryId);
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function getCategoryBreakdown() {
+      return categories.map(category => {
+        const stats = categoryStats[category.id];
+        const percentage = stats.total ? Math.round((stats.agree / stats.total) * 100) : 0;
+        return { ...category, percentage, agree: stats.agree, total: stats.total };
+      });
+    }
+
+    function renderCategoryResults() {
+      const breakdown = getCategoryBreakdown();
+      const bestPercentage = Math.max(...breakdown.map(item => item.percentage));
+      const bestCategories = breakdown.filter(item => item.percentage === bestPercentage);
+      const bestNames = bestCategories.map(item => item.name).join(" ו־");
+
+      document.getElementById("bestTopicIcon").textContent = bestCategories.length === 1 ? bestCategories[0].icon : "🏆";
+      document.getElementById("bestTopicTitle").textContent = bestNames;
+      document.getElementById("bestTopicCopy").textContent = `זה הנושא שבו הייתם הכי מתואמים: ${bestPercentage}% הסכמה.`;
+
+      document.getElementById("categoryResults").innerHTML = breakdown.map(item => `
+        <div class="category-result">
+          <div class="category-result-head">
+            <span>${item.icon} ${item.name}</span>
+            <span>${item.percentage}%</span>
+          </div>
+          <div class="category-result-bar" aria-label="${item.percentage}% הסכמה">
+            <span style="width: ${item.percentage}%"></span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function showResults() {
+      const total = agreeCount + disagreeCount;
+      const percentage = total ? Math.round((agreeCount / total) * 100) : 0;
+      const band = resultBands.find(item => percentage >= item.min);
+
+      document.getElementById("scoreNumber").textContent = `${percentage}%`;
+      document.getElementById("resultTitle").textContent = band.title;
+      document.getElementById("resultCopy").textContent = band.copy;
+      document.getElementById("agreeStat").textContent = agreeCount;
+      document.getElementById("disagreeStat").textContent = disagreeCount;
+      document.getElementById("streakStat").textContent = bestStreak;
+      renderCategoryResults();
+
+      const angle = percentage * 3.6;
+      scoreRing.style.background = `conic-gradient(var(--pink) 0deg, var(--purple) ${angle}deg, rgba(255,255,255,0.08) ${angle}deg)`;
+      progressFill.style.width = "100%";
+      showScreen(resultScreen);
+
+      if (percentage >= 60) createBurst(18);
+    }
+
+    async function shareResult() {
+      const score = document.getElementById("scoreNumber").textContent;
+      const title = document.getElementById("resultTitle").textContent;
+      const bestTopic = document.getElementById("bestTopicTitle").textContent;
+      const text = `שיחקנו “מסכימים או מסתבכים?” וקיבלנו ${score} במדד התיאום הזוגי — ${title}. הכי הסכמנו בנושא: ${bestTopic}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "מסכימים או מסתבכים?", text });
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+        }
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("התוצאה הועתקה");
+      } catch (error) {
+        showToast("לא הצלחנו להעתיק אוטומטית");
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function createBurst(amount = 10) {
+      const symbols = ["💗", "✨", "💞", "⚡", "💘"];
+      for (let i = 0; i < amount; i++) {
+        const item = document.createElement("span");
+        item.className = "burst";
+        item.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        item.style.left = `${45 + Math.random() * 10}%`;
+        item.style.top = `${45 + Math.random() * 10}%`;
+        item.style.setProperty("--x", `${(Math.random() - 0.5) * 360}px`);
+        item.style.setProperty("--y", `${(Math.random() - 0.5) * 300}px`);
+        item.style.setProperty("--r", `${(Math.random() - 0.5) * 180}deg`);
+        document.body.appendChild(item);
+        setTimeout(() => item.remove(), 1300);
+      }
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("shareBtn").addEventListener("click", shareResult);
+    nextBtn.addEventListener("click", nextQuestion);
+
+    document.querySelectorAll("[data-answer]").forEach(button => {
+      button.addEventListener("click", () => handleAnswer(button.dataset.answer));
+    });
+  </script>
+</body>
+</html>
