@@ -29,6 +29,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       color: var(--text);
       font-family: Arial, "Segoe UI", sans-serif;
       background:
@@ -68,9 +69,15 @@
       font: inherit;
     }
 
+    button:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 4px;
+    }
+
     .app {
       width: min(920px, 100%);
       min-height: 100vh;
+      min-height: 100dvh;
       margin: 0 auto;
       padding: 22px 16px 32px;
       display: flex;
@@ -351,6 +358,92 @@
       opacity: 0.84;
     }
 
+
+    .resume-box {
+      display: none;
+      margin: 20px 0 12px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.13);
+    }
+
+    .resume-box.visible {
+      display: block;
+    }
+
+    .resume-box strong,
+    .resume-box span {
+      display: block;
+    }
+
+    .resume-box strong {
+      margin-bottom: 5px;
+      font-size: 1.05rem;
+    }
+
+    .resume-box span {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .resume-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .topic-question-progress {
+      display: block;
+      margin-top: 7px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .selection-summary {
+      display: none;
+      max-width: 670px;
+      width: 100%;
+      margin: 18px auto 0;
+      padding: 14px 16px;
+      border-radius: 17px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
+      text-align: right;
+    }
+
+    .selection-summary.visible {
+      display: flex;
+    }
+
+    .selection-summary.undo-only {
+      justify-content: flex-end;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+
+    .selection-summary span {
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .undo-btn {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border-radius: 12px;
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.17);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
     .feedback {
       display: none;
       max-width: 670px;
@@ -378,25 +471,6 @@
       margin: 0;
       color: var(--muted);
       line-height: 1.55;
-    }
-
-    .challenge-box {
-      display: none;
-      margin-top: 16px;
-      padding: 16px;
-      border-radius: 16px;
-      color: #3a2149;
-      background: linear-gradient(135deg, #ffe7b1, #fff5d9);
-      text-align: right;
-    }
-
-    .challenge-box.visible {
-      display: block;
-    }
-
-    .challenge-box strong {
-      display: block;
-      margin-bottom: 5px;
     }
 
     .next-btn {
@@ -543,7 +617,7 @@
 
 
     .topic-intro-panel {
-      min-height: min(680px, calc(100vh - 44px));
+      min-height: min(680px, calc(100dvh - 44px));
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -762,7 +836,7 @@
       }
 
       .panel {
-        min-height: calc(100vh - 24px);
+        min-height: calc(100dvh - 24px);
         border-radius: 24px;
         padding: 24px 17px;
       }
@@ -777,7 +851,7 @@
       }
 
       .question-wrap {
-        min-height: calc(100vh - 125px);
+        min-height: calc(100dvh - 125px);
       }
 
       .answers,
@@ -787,6 +861,10 @@
 
       .answer-btn {
         min-height: 72px;
+      }
+
+      .resume-actions {
+        grid-template-columns: 1fr;
       }
 
       .topbar {
@@ -815,30 +893,39 @@
         <span class="eyebrow">⚡ 25 סיטואציות זוגיות</span>
         <h1>מסכימים<br><span>או מסתבכים?</span></h1>
         <p class="lead">
-          בכל סיבוב תופיע סיטואציה. ספרו עד שלוש, הצביעו יחד על מי שמתאים יותר,
-          ואז סמנו אם הסכמתם. בסוף תגלו את אחוז ההסכמה הזוגי שלכם.
+          בכל סיבוב תופיע סיטואציה. ב־3, 2, 1 כל אחד מצביע על מי שמתאים יותר,
+          ואז מסמנים אם הסכמתם או לא הסכמתם.
         </p>
         <p class="language-note">* מטעמי נוחות, השאלות וההוראות נכתבו בלשון זכר אך פונות לכל המינים.</p>
 
         <div class="rule-grid">
           <div class="rule">
             <div class="rule-icon">👀</div>
-            <strong>קוראים וחושבים</strong>
-            <span>אל תגלו את התשובה לפני ההצבעה.</span>
+            <strong>קוראים</strong>
+            <span>קוראים יחד את הסיטואציה שמופיעה על המסך.</span>
           </div>
           <div class="rule">
             <div class="rule-icon">👉</div>
-            <strong>מצביעים יחד</strong>
-            <span>ב־3, 2, 1 מצביעים על עצמכם או זה על זה.</span>
+            <strong>מצביעים</strong>
+            <span>ב־3, 2, 1 כל אחד מצביע על מי שמתאים יותר.</span>
           </div>
           <div class="rule">
             <div class="rule-icon">📊</div>
-            <strong>מגלים את התוצאה</strong>
-            <span>מסמנים הסכמנו או לא הסכמנו ומקבלים אחוז בסיום.</span>
+            <strong>מסמנים</strong>
+            <span>לוחצים „הסכמנו” או „לא הסכמנו” וממשיכים.</span>
           </div>
         </div>
 
-        <button id="startBtn" class="primary-btn">מתחילים את הדו־קרב</button>
+        <div id="resumeBox" class="resume-box">
+          <strong>יש לכם משחק שלא הסתיים</strong>
+          <span id="resumeText"></span>
+          <div class="resume-actions">
+            <button id="continueBtn" class="primary-btn">להמשיך מאיפה שעצרנו</button>
+            <button id="newGameBtn" class="secondary-btn">להתחיל משחק חדש</button>
+          </div>
+        </div>
+
+        <button id="startBtn" class="primary-btn">מתחילים לשחק</button>
       </div>
     </section>
 
@@ -869,30 +956,14 @@
 
         <div class="question-wrap">
           <div id="questionKicker" class="question-kicker">צחוקים ופדיחות</div>
+          <span id="topicQuestionProgress" class="topic-question-progress">שאלה 1 מתוך 5 בנושא</span>
           <h2 id="questionText" class="question"></h2>
-          <p class="countdown-note">אל תגלו עדיין — <strong>3, 2, 1... מצביעים!</strong></p>
+          <p class="countdown-note"><strong>3, 2, 1... מצביעים!</strong></p>
 
           <div id="answers" class="answers">
-            <button class="answer-btn agree" data-answer="agree">
-              הסכמנו
-              <small>שנינו הצבענו על אותו אדם</small>
-            </button>
-            <button class="answer-btn disagree" data-answer="disagree">
-              לא הסכמנו
-              <small>כל אחד הצביע אחרת</small>
-            </button>
+            <button class="answer-btn agree" data-answer="agree">הסכמנו</button>
+            <button class="answer-btn disagree" data-answer="disagree">לא הסכמנו</button>
           </div>
-
-          <div id="feedback" class="feedback" aria-live="polite">
-            <div id="feedbackTitle" class="feedback-title"></div>
-            <p id="feedbackText" class="feedback-text"></p>
-            <div id="challengeBox" class="challenge-box">
-              <strong id="challengeTitle"></strong>
-              <span id="challengeText"></span>
-            </div>
-          </div>
-
-          <button id="nextBtn" class="next-btn">לסיטואציה הבאה</button>
         </div>
       </div>
     </section>
@@ -961,7 +1032,7 @@
         name: "צחוקים ופדיחות",
         chip: "מצחיק",
         icon: "😂",
-        copy: "פותחים בחמש סיטואציות קלילות שיחשפו מי מכם מספק יותר חומר לבדיחות.",
+        copy: "מתחילים קליל — מי מכם מספק יותר חומר לבדיחות?",
         questions: [
           "מי מכם יותר סביר שיגיד ‘אני לא רעב’ ואז יאכל חצי מהצלחת של השני?",
           "מי מכם יותר סביר שיחפש את הטלפון בזמן שהוא כבר ביד שלו?",
@@ -975,7 +1046,7 @@
         name: "הרגלים בבית",
         chip: "הרגלים",
         icon: "🏠",
-        copy: "עכשיו בודקים את הדברים הקטנים שחוזרים בכל יום — ושכל אחד מכם כנראה זוכר אחרת.",
+        copy: "עכשיו נכנסים להרגלים הקטנים של הבית.",
         questions: [
           "מי מכם יותר סביר שידחה את השעון המעורר שוב ושוב עד שכבר מאוחר מדי?",
           "מי מכם יותר סביר שישאיר כוס במקום אקראי בבית ויחפש אותה אחר כך?",
@@ -989,7 +1060,7 @@
         name: "בילויים וכסף",
         chip: "בילויים וכסף",
         icon: "💸",
-        copy: "חמש שאלות על החלטות, יציאות וקניות. כאן בדרך כלל מתחילים הוויכוחים הטובים באמת.",
+        copy: "עוברים ליציאות, קניות והחלטות של הרגע.",
         questions: [
           "מי מכם יותר סביר שיבדוק את התפריט עוד לפני שהגעתם למסעדה?",
           "מי מכם יותר סביר שיבחר מה להזמין ואז יתחרט כשהאוכל מגיע?",
@@ -1003,7 +1074,7 @@
         name: "זוגיות ורגש",
         chip: "זוגיות ורגש",
         icon: "💞",
-        copy: "עוברים למה שבאמת קורה ביניכם: פיוסים, תשומת לב וכל הדברים הקטנים שמרגישים גדולים.",
+        copy: "עוברים לצד הרגשי של הזוגיות שלכם.",
         questions: [
           "מי מכם יותר סביר שייזום פיוס ראשון אחרי ויכוח?",
           "מי מכם יותר סביר שיזכור פרט קטן שהשני סיפר לפני חודשים?",
@@ -1017,7 +1088,7 @@
         name: "רומנטיקה ופלרטוט",
         chip: "רומנטיקה",
         icon: "🔥",
-        copy: "מסיימים בחמש סיטואציות קצת יותר רומנטיות. נראה אם גם כאן אתם קוראים זה את זה נכון.",
+        copy: "מסיימים עם קצת רומנטיקה ופלרטוט.",
         questions: [
           "מי מכם יותר סביר שייזום נשיקה ברגע הכי לא צפוי?",
           "מי מכם יותר סביר שישלח הודעה פלרטטנית באמצע יום עבודה רגיל?",
@@ -1028,30 +1099,6 @@
       }
     ];
 
-    const agreeResponses = [
-      ["התאמה!", "שניכם יודעים בדיוק במי מדובר."],
-      ["מסכימים בלי היסוס", "מישהו כאן צפוי מאוד — ושניכם יודעים מי."],
-      ["אותה גרסה לאירועים", "יפה. לפחות על זה אין ויכוח בבית."],
-      ["נקודה לתיאום", "הסכמתם מהר מדי. קצת חשוד, אבל מרשים."],
-      ["יש ביניכם קליטה", "עוד תשובה שבה אתם קוראים זה את זה בלי מילים."]
-    ];
-
-    const disagreeResponses = [
-      ["הסתבכתם!", "שתי תשובות, זוגיות אחת. עכשיו מתחיל הוויכוח האמיתי."],
-      ["רגע, מה?", "כנראה שכל אחד מכם חי בגרסה אחרת של אותה זוגיות."],
-      ["אין הסכמה", "כל אחד בטוח שהשני הוא הבעיה. קלאסי."],
-      ["מחלוקת רשמית", "הגיע הזמן לפתוח את תיק הראיות."],
-      ["לא אותו סיפור", "מעניין מי מכם יצליח לשכנע את השני."]
-    ];
-
-    const challenges = [
-      ["תביאו הוכחה", "לכל אחד יש 15 שניות לספר על מקרה שמוכיח שהתשובה שלו נכונה."],
-      ["נאום ההגנה", "כל אחד מקבל 10 שניות להסביר למה הסיטואציה הזאת ממש לא מתארת אותו."],
-      ["הפעם האחרונה", "נסו להיזכר יחד בפעם האחרונה שזה באמת קרה."],
-      ["בלי להתחמק", "כל אחד אומר במשפט אחד למה הוא הצביע דווקא כך."],
-      ["פשרה זוגית", "החליטו יחד מי באמת מתאים יותר — או קבלו שלעולם לא תסכימו."],
-      ["מחיר ההסתבכות", "לפני שממשיכים, כל אחד נותן לשני מחמאה אחת שלא אמר בזמן האחרון."]
-    ];
 
     const resultBands = [
       { min: 80, title: "אותו ראש, שני אנשים", copy: "אתם יודעים בדיוק מי עושה מה, מי אשם ובמי אסור לתת אמון עם כרטיס האשראי. רמת תיאום מרשימה מאוד." },
@@ -1070,16 +1117,14 @@
     const categoryChip = document.getElementById("categoryChip");
     const progressFill = document.getElementById("progressFill");
     const answers = document.getElementById("answers");
-    const feedback = document.getElementById("feedback");
-    const feedbackTitle = document.getElementById("feedbackTitle");
-    const feedbackText = document.getElementById("feedbackText");
-    const challengeBox = document.getElementById("challengeBox");
-    const challengeTitle = document.getElementById("challengeTitle");
-    const challengeText = document.getElementById("challengeText");
-    const nextBtn = document.getElementById("nextBtn");
     const scoreRing = document.getElementById("scoreRing");
     const toast = document.getElementById("toast");
     const questionKicker = document.getElementById("questionKicker");
+    const topicQuestionProgress = document.getElementById("topicQuestionProgress");
+    const resumeBox = document.getElementById("resumeBox");
+    const resumeText = document.getElementById("resumeText");
+
+    const STORAGE_KEY = "agree-or-complicate-game-v4";
 
     let categoryIntroTimer = null;
 
@@ -1089,8 +1134,8 @@
     let disagreeCount = 0;
     let currentStreak = 0;
     let bestStreak = 0;
-    let challengesShown = 0;
-    let answeredCurrent = false;
+    let inputLocked = false;
+    let unlockTimer = null;
     let categoryStats = {};
 
     function shuffle(array) {
@@ -1118,31 +1163,108 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    function createInitialCategoryStats() {
+      return Object.fromEntries(categories.map(category => [category.id, { agree: 0, total: 0 }]));
+    }
+
+    function readSavedGame() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const saved = JSON.parse(raw);
+        if (!Array.isArray(saved.gameQuestions) || !saved.gameQuestions.length) return null;
+        if (saved.currentIndex < 0 || saved.currentIndex >= saved.gameQuestions.length) return null;
+        return saved;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function saveGame() {
+      if (!gameQuestions.length || currentIndex >= gameQuestions.length) return;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          gameQuestions,
+          currentIndex,
+          agreeCount,
+          disagreeCount,
+          currentStreak,
+          bestStreak,
+          categoryStats
+        }));
+      } catch (error) {
+        // המשחק ממשיך גם אם הדפדפן חסם שמירה מקומית.
+      }
+      updateResumeBox();
+    }
+
+    function clearSavedGame() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (error) {
+        // אין צורך לעצור את המשחק אם המחיקה נחסמה.
+      }
+      updateResumeBox();
+    }
+
+    function updateResumeBox() {
+      const saved = readSavedGame();
+      if (!saved) {
+        resumeBox.classList.remove("visible");
+        document.getElementById("startBtn").style.display = "block";
+        return;
+      }
+
+      resumeText.textContent = `עצרנו בשאלה ${saved.currentIndex + 1} מתוך ${saved.gameQuestions.length}.`;
+      resumeBox.classList.add("visible");
+      document.getElementById("startBtn").style.display = "none";
+    }
+
     function startGame() {
+      if (categoryIntroTimer) clearTimeout(categoryIntroTimer);
+      clearSavedGame();
       gameQuestions = buildQuestions();
       currentIndex = 0;
       agreeCount = 0;
       disagreeCount = 0;
       currentStreak = 0;
       bestStreak = 0;
-      challengesShown = 0;
-      categoryStats = Object.fromEntries(categories.map(category => [category.id, { agree: 0, total: 0 }]));
+      inputLocked = false;
+      if (unlockTimer) clearTimeout(unlockTimer);
+      categoryStats = createInitialCategoryStats();
+      saveGame();
       showCategoryIntro(categories[0].id);
+    }
+
+    function continueGame() {
+      const saved = readSavedGame();
+      if (!saved) {
+        startGame();
+        return;
+      }
+
+      gameQuestions = saved.gameQuestions;
+      currentIndex = saved.currentIndex;
+      agreeCount = saved.agreeCount || 0;
+      disagreeCount = saved.disagreeCount || 0;
+      currentStreak = saved.currentStreak || 0;
+      bestStreak = saved.bestStreak || 0;
+      categoryStats = saved.categoryStats || createInitialCategoryStats();
+      inputLocked = false;
+
+      showScreen(gameScreen);
+      renderQuestion();
     }
 
     function showCategoryIntro(categoryId) {
       const categoryIndex = categories.findIndex(category => category.id === categoryId);
       const category = categories[categoryIndex];
 
-      if (categoryIntroTimer) {
-        clearTimeout(categoryIntroTimer);
-      }
+      if (categoryIntroTimer) clearTimeout(categoryIntroTimer);
 
-      document.getElementById("topicCount").textContent = categoryIndex === 0
-        ? "החלק הראשון מתחיל"
-        : "מחליפים נושא";
+      document.getElementById("topicCount").textContent = `חלק ${categoryIndex + 1} מתוך ${categories.length}`;
       document.getElementById("topicIcon").textContent = category.icon;
-      document.getElementById("topicTitle").textContent = `חלק ${categoryIndex + 1}: ${category.name}`;
+      document.getElementById("topicTitle").textContent = category.name;
       document.getElementById("topicCopy").textContent = category.copy;
       showScreen(categoryScreen);
 
@@ -1152,31 +1274,43 @@
       }, 1000);
     }
 
-    function renderQuestion() {
-      answeredCurrent = false;
-      const item = gameQuestions[currentIndex];
-      questionText.textContent = item.text;
-      roundNumber.textContent = `${currentIndex + 1} מתוך ${gameQuestions.length}`;
-      const currentCategory = categories.find(category => category.id === item.categoryId);
-      questionKicker.textContent = currentCategory.name;
-      categoryChip.textContent = currentCategory.name;
-      progressFill.style.width = `${(currentIndex / gameQuestions.length) * 100}%`;
-
-      answers.style.display = "grid";
-      feedback.classList.remove("visible");
-      challengeBox.classList.remove("visible");
-      nextBtn.classList.remove("visible");
-      nextBtn.textContent = currentIndex === gameQuestions.length - 1 ? "לגלות את התוצאה" : "לסיטואציה הבאה";
+    function getTopicQuestionNumber(index) {
+      const categoryId = gameQuestions[index].categoryId;
+      return gameQuestions.slice(0, index + 1).filter(item => item.categoryId === categoryId).length;
     }
 
-    function pickRandom(list) {
-      return list[Math.floor(Math.random() * list.length)];
+    function renderQuestion() {
+      const item = gameQuestions[currentIndex];
+      const currentCategory = categories.find(category => category.id === item.categoryId);
+      const topicQuestionNumber = getTopicQuestionNumber(currentIndex);
+
+      questionText.textContent = item.text;
+      roundNumber.textContent = `${currentIndex + 1} מתוך ${gameQuestions.length}`;
+      questionKicker.textContent = currentCategory.name;
+      topicQuestionProgress.textContent = `שאלה ${topicQuestionNumber} מתוך ${currentCategory.questions.length} בנושא`;
+      categoryChip.textContent = currentCategory.name;
+      progressFill.style.width = `${((currentIndex + 1) / gameQuestions.length) * 100}%`;
+
+      answers.style.display = "grid";
+      document.querySelectorAll("[data-answer]").forEach(button => {
+        button.disabled = false;
+      });
+
+      saveGame();
+
+      if (unlockTimer) clearTimeout(unlockTimer);
+      unlockTimer = setTimeout(() => {
+        inputLocked = false;
+      }, 250);
     }
 
     function handleAnswer(type) {
-      if (answeredCurrent) return;
-      answeredCurrent = true;
-      answers.style.display = "none";
+      if (inputLocked) return;
+      inputLocked = true;
+
+      document.querySelectorAll("[data-answer]").forEach(button => {
+        button.disabled = true;
+      });
 
       const item = gameQuestions[currentIndex];
       categoryStats[item.categoryId].total++;
@@ -1186,43 +1320,22 @@
         categoryStats[item.categoryId].agree++;
         currentStreak++;
         bestStreak = Math.max(bestStreak, currentStreak);
-        const response = pickRandom(agreeResponses);
-        feedbackTitle.textContent = response[0];
-        feedbackText.textContent = response[1];
-        createBurst();
       } else {
         disagreeCount++;
         currentStreak = 0;
-        const response = pickRandom(disagreeResponses);
-        feedbackTitle.textContent = response[0];
-        feedbackText.textContent = response[1];
-
-        const shouldShowChallenge = disagreeCount % 2 === 1 && challengesShown < 5;
-        if (shouldShowChallenge) {
-          const challenge = challenges[challengesShown % challenges.length];
-          challengeTitle.textContent = challenge[0];
-          challengeText.textContent = challenge[1];
-          challengeBox.classList.add("visible");
-          challengesShown++;
-        }
       }
 
-      feedback.classList.add("visible");
-      nextBtn.classList.add("visible");
-    }
-
-    function nextQuestion() {
-      if (!answeredCurrent) return;
       if (currentIndex >= gameQuestions.length - 1) {
         showResults();
         return;
       }
 
-      const currentCategoryId = gameQuestions[currentIndex].categoryId;
+      const currentCategoryId = item.categoryId;
       currentIndex++;
       const nextCategoryId = gameQuestions[currentIndex].categoryId;
 
       if (nextCategoryId !== currentCategoryId) {
+        saveGame();
         showCategoryIntro(nextCategoryId);
       } else {
         renderQuestion();
@@ -1245,7 +1358,9 @@
 
       document.getElementById("bestTopicIcon").textContent = bestCategories.length === 1 ? bestCategories[0].icon : "🏆";
       document.getElementById("bestTopicTitle").textContent = bestNames;
-      document.getElementById("bestTopicCopy").textContent = `זה הנושא שבו הייתם הכי מתואמים: ${bestPercentage}% הסכמה.`;
+      document.getElementById("bestTopicCopy").textContent = bestCategories.length === 1
+        ? `זה הנושא שבו הייתם הכי מתואמים: ${bestPercentage}% הסכמה.`
+        : `אלה הנושאים שבהם הייתם הכי מתואמים: ${bestPercentage}% הסכמה.`;
 
       document.getElementById("categoryResults").innerHTML = breakdown.map(item => `
         <div class="category-result">
@@ -1276,6 +1391,7 @@
       const angle = percentage * 3.6;
       scoreRing.style.background = `conic-gradient(var(--pink) 0deg, var(--purple) ${angle}deg, rgba(255,255,255,0.08) ${angle}deg)`;
       progressFill.style.width = "100%";
+      clearSavedGame();
       showScreen(resultScreen);
 
       if (percentage >= 60) createBurst(18);
@@ -1327,13 +1443,18 @@
     }
 
     document.getElementById("startBtn").addEventListener("click", startGame);
-    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("continueBtn").addEventListener("click", continueGame);
+    document.getElementById("newGameBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      if (window.confirm("להתחיל משחק חדש ולמחוק את התוצאה הנוכחית?")) startGame();
+    });
     document.getElementById("shareBtn").addEventListener("click", shareResult);
-    nextBtn.addEventListener("click", nextQuestion);
 
     document.querySelectorAll("[data-answer]").forEach(button => {
       button.addEventListener("click", () => handleAnswer(button.dataset.answer));
     });
+
+    updateResumeBox();
   </script>
 </body>
 </html>
